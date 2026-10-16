@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Liar's Dice</title>
+<style>
+:root{--felt:#1e293b;--deep:#0f172a;--ivory:#e5e7eb;--brass:#38bdf8;--ink:#1d1a14;--red:#b4442f;--mute:#94a3b8;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--deep);color:var(--ivory);font:15px/1.45 system-ui,sans-serif}[hidden]{display:none!important}#live{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 3.2rem)}
+h1,h2,.die,.bid{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+h1{font-size:1.6rem;margin:0 0 1rem}h2{font-size:1.05rem;margin:1.3rem 0 .4rem;color:var(--brass)}
+aside{background:#0b1220;padding:1rem;border-right:1px solid #1e293b;overflow:auto}
+main{padding:1rem 1.5rem;background:radial-gradient(ellipse at 50% 0,var(--felt),var(--deep) 70%)}
+.mute{color:var(--mute)}aside a{color:var(--brass)}.err{color:#f08a73;min-height:1.4em}
+button,select,input{font:inherit;padding:.4rem .8rem;border-radius:.4rem;border:1px solid var(--brass);background:transparent;color:var(--ivory)}
+button{cursor:pointer}button.p{background:var(--brass);color:var(--ink)}button.call{background:var(--red);border-color:var(--red)}button:disabled{opacity:.4}
+select option{color:#000}input[type=number]{width:4.5rem}:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.bot,.g{display:flex;justify-content:space-between;gap:.5rem;padding:.3rem 0;border-bottom:1px solid #1e293b}
+.bot button{padding:0 .4rem;border-color:#475569}
+.g{flex-direction:column;cursor:pointer;padding:.4rem .5rem;border-radius:.3rem}.g.on{background:#ffffff18}.g small{color:var(--mute)}
+.row{display:flex;align-items:center;gap:1rem;padding:.5rem .8rem;border-radius:.6rem}
+.row.turn{background:#ffffff14;box-shadow:inset 3px 0 var(--brass)}.row.out{opacity:.3}.nm{min-width:7rem}
+.die{display:inline-grid;place-items:center;width:2.3rem;height:2.3rem;margin:3px;border-radius:.45rem;background:var(--ivory);color:var(--ink);font-size:1.4rem;font-weight:700}
+.die.one{color:var(--red)}.die.pub{outline:2px solid var(--brass);outline-offset:1px}.die.back{background:#334155;color:#64748b}
+.die.mine{cursor:pointer}.die.sel{transform:translateY(-7px);box-shadow:0 7px 0 -2px var(--brass)}
+.bid{font-size:1.9rem}#info{margin:1rem 0;min-height:3rem}
+#log{max-height:40vh;overflow:auto;font-size:.9rem;color:var(--mute);border-top:1px solid #1e293b;margin-top:1rem;padding-top:.5rem}
+header{display:flex;align-items:center;gap:2rem;padding:0 1.5rem;height:3.2rem;background:#0b1220;border-bottom:1px solid #1e293b}
+header b small{color:var(--mute);font-weight:400;margin-left:.6rem}
+nav a{display:inline-block;line-height:3.2rem;margin-right:1.2rem;color:var(--mute);cursor:pointer}nav a.on{color:#fff;box-shadow:inset 0 -2px var(--brass)}
+.page{max-width:900px;margin:0 auto;padding:.5rem 1.5rem 3rem}.page h2{font:600 1.3rem system-ui;color:#fff;margin:1.8rem 0 .7rem}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid #1e293b}th{color:var(--mute);font-weight:500}
+.n{text-align:right;font-variant-numeric:tabular-nums}td:first-child{width:3.5rem;color:var(--mute)}
+.bar{display:grid;grid-template-columns:11rem 1fr 4rem;gap:.7rem;align-items:center;margin:.35rem 0}.bar div{background:#1e293b;height:1rem;border-radius:3px}.bar i{display:block;height:100%;border-radius:3px}.bar b{text-align:right;font-weight:500}
+.legend span{margin-right:1rem}.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;border-radius:2px}
+#dbgbots label{display:block;padding:.15rem 0}#dbg code{color:var(--brass)}#dbg:not(:empty){border:1px dashed var(--brass);border-radius:.5rem;padding:.6rem .9rem;margin:.8rem 0}#dbg pre{max-height:14rem;overflow:auto;font-size:.8rem}
+@media(max-width:800px){#live{grid-template-columns:1fr}.bar{grid-template-columns:6rem 1fr 3.5rem}}
+</style></head><body>
+<header><b>Liar's Dice<small>Programátorský boj</small></b><nav><a id=t-live>Live</a><a id=t-mt>Zápasy</a><a id=t-lb>Leaderboard</a></nav></header>
+<div id=live>
+<aside>
+<button class=p onclick="run()">Run a bot game now</button>
+<p class=mute style="margin:.4rem 0">Players <select id=runp></select> Dice <input type=number id=rund min=1 max=20 placeholder=random></p>
+<details><summary class=mute style="margin-top:.7rem;cursor:pointer">Debug game (step by step)</summary>
+<div id=dbgbots></div>
+<p class=mute style="margin:.4rem 0">Dice <input type=number id=dbgd min=1 max=20 placeholder=random></p><button onclick="debugGame()">Start debug game</button>
+<p class=mute>Pick 2+ bots (list order = seating, first one opens). Nothing moves until you click "Next action".</p></details>
+<h2>Play yourself</h2>
+<select id=opp></select> bot opponents <button onclick="play()">Join a game</button>
+<h2>Bots <small class=mute>(wins / games)</small></h2>
+<div id=bots></div>
+<p><label class=mute>Upload bot (.py) <input type=file id=up accept=.py multiple></label></p>
+<p><a href="/api/template" download="def.py">Stiahnuť default bota</a></p>
+<h2>Settings</h2>
+<p class=mute>Scheduled game every <input type=number id=iv min=0> s (0 = paused)</p>
+<h2>Games</h2><div id=games></div>
+</aside>
+<main>
+<div id=table></div><div id=info></div><div id=dbg></div><div id=ctl></div><div id=log></div>
+</main>
+</div>
+<div class=page id=lb hidden>
+<h2>Graf skóre</h2><div id=chart></div>
+<h2>Priemerné skóre za posledných 50 hier</h2><div id=avgchart></div><div id=avg></div>
+<h2>Leaderboard</h2>
+<table><thead><tr><th>#<th>Bot<th class=n>Body</thead><tbody id=rows></tbody></table>
+</div>
+<div class=page id=mt hidden>
+<h2>Zápasy</h2>
+<table><thead><tr><th>Čas<th>Výsledok (body)</thead><tbody id=mrows></tbody></table>
+</div>
+<script>
+const $=s=>document.querySelector(s);let tab='live',botKey='',dbgKey='',cur=null,S=null,V=null,lastKey='',sel=new Set(),init=false;
+const api=async(p,o)=>{const r=await fetch(p,o),j=await r.json();if(j.error)throw new Error(j.error);return j};
+const post=(p,b)=>api(p,{method:'POST',body:JSON.stringify(b||{})});
+const face=f=>f==1?'ones':f+'s';
+const die=(d,c='',a='')=>`<span class="die ${d==1?'one':''} ${c}" ${a}>${d}</span>`;
+async function tick(){try{S=await api('/api/state');side();if(tab!='live')loadBoard();if(!cur&&S.games.length)cur=S.games[0].id;if(cur){V=await api('/api/game/'+cur);game()}}catch(e){}}
+function side(){
+ if(!init){init=true;$('#iv').value=S.cfg.interval}
+ const bk=S.bots.map(b=>b.name).join();if(bk!=botKey){botKey=bk;dbgList();fillSel()}
+ $('#bots').innerHTML=S.bots.length?S.bots.map(b=>`<div class=bot><span>${b.name}</span><span class=mute>${b.wins} / ${b.games}</span></div>`).join(''):'<p class=mute>No bots yet. Upload a .py file with a decide(state) function.</p>';
+ $('#games').innerHTML=S.games.map(g=>`<div class="g ${g.id==cur?'on':''}" onclick="cur='${g.id}';lastKey='';sel.clear();tick()">${g.debug?'[debug] ':''}${g.names.join(', ')}<small>${g.dice} dice · ${g.status}${g.winner?' – '+g.winner+' won':''}</small></div>`).join('')||'<p class=mute>No games yet.</p>';
+}
+function game(){
+ const v=V,me=v.you,over=v.winner!=null||v.status=='abandoned',mine=me!=null&&v.turn==me&&!over;
+ $('#table').innerHTML=v.names.map((nm,i)=>{
+  const out=!v.shown[i].length&&!v.hidden_counts[i];
+  const pub=v.shown[i].map(d=>die(d,'pub')).join('');
+  const hid=v.all_hidden?v.all_hidden[i].map(d=>die(d)).join(''):i===me?v.your_dice.map((d,k)=>die(d,'mine'+(sel.has(k)?' sel':''),`data-k=${k} tabindex=0`)).join(''):Array(v.hidden_counts[i]).fill(0).map(()=>die('?','back')).join('');
+  return `<div class="row ${v.turn==i&&!over?'turn':''} ${out?'out':''}"><b class=nm>${nm}</b><span>${pub}${hid}</span></div>`}).join('');
+ $('#info').innerHTML=v.winner!=null?`<span class=bid>${v.names[v.winner]} wins</span>`:v.status=='abandoned'?'Game abandoned.':
+  `Round ${v.round} – `+(v.bid?`${v.names[v.bidder]} bid <span class=bid>${v.bid[0]} × ${face(v.bid[1])}</span>`:`no bid yet, ${v.names[v.turn]} opens`);
+ const key=[v.id,mine,v.round,JSON.stringify(v.bid),v.must_raise].join();
+ if(key!=lastKey){lastKey=key;sel.clear();
+  $('#ctl').innerHTML=mine?`<select id=bsel>${v.legal_bids.map(b=>`<option value="${b}">${b[0]} × ${face(b[1])}</option>`).join('')}</select>
+   <button class=p onclick="bid()">Bid</button>
+   ${v.can_call?'<button class=call onclick="act({action:\'call\'})">Call bluff</button>':''}
+   ${v.must_raise?'':'<button onclick="act({action:\'reveal\',indices:[...sel]})">Reveal selected dice &amp; reroll</button>'}
+   <p class=mute>${v.must_raise?'You rerolled – now raise the bid.':'Click your dice to select them for revealing.'}</p><p id=err class=err></p>`
+  :(over||me==null)?'':`<p class=mute>Waiting for ${v.names[v.turn]}…</p>`}
+ if(v.debug){const t=v.trace,k=[v.id,t?t.n:0,v.status,v.auto,v.turn].join();
+  if(k!=dbgKey){dbgKey=k;$('#dbg').innerHTML='<b>Debug game</b> – '+(over?'finished.':v.auto?'running to the end…':`next: <b>${v.names[v.turn]}</b> <button class=p onclick="dbgStep()">Next action ▶</button> <button onclick="dbgAuto()">Run to end</button>`)
+   +(t?`<p>Last: <b>${t.bot}</b> → <code>${JSON.stringify(t.response)}</code> ${t.note?'<span class=err>'+t.note+'</span>':''}</p><details><summary class=mute>State the bot saw</summary><pre>${JSON.stringify(t.state,null,1)}</pre></details>`:'<p class=mute>No action yet – click "Next action".</p>')}
+ }else{dbgKey='';if($('#dbg').innerHTML)$('#dbg').innerHTML=''}
+ $('#log').innerHTML=v.log.slice().reverse().map(l=>`<div>${l}</div>`).join('');
+}
+$('#table').onclick=e=>{const d=e.target.closest('.mine');if(!d)return;const k=+d.dataset.k;sel.has(k)?sel.delete(k):sel.add(k);d.classList.toggle('sel')};
+const act=async a=>{try{await post('/api/game/'+cur+'/act',a);tick()}catch(e){$('#err').textContent=e.message}};
+const bid=()=>{const[c,f]=$('#bsel').value.split(',');act({action:'bid',count:+c,face:+f})};
+const run=()=>post('/api/run',{opponents:+$('#runp').value||null,dice:+$('#rund').value||null}).then(r=>{cur=r.id;tick()}).catch(e=>alert(e.message));
+const play=()=>post('/api/play',{opponents:+$('#opp').value||null}).then(r=>{cur=r.id;lastKey='';tick()}).catch(e=>alert(e.message));
+const del=n=>post('/api/delete?name='+n).then(tick);
+const cfg=()=>post('/api/config',{interval:+$('#iv').value});
+$('#iv').onchange=cfg;
+$('#up').onchange=async e=>{for(const f of e.target.files){try{await api('/api/upload?name='+encodeURIComponent(f.name),{method:'POST',body:f})}catch(x){alert(f.name+': '+x.message)}}e.target.value='';tick()};
+const COL=['#38bdf8','#f472b6','#facc15','#4ade80','#a78bfa','#fb923c','#f87171','#2dd4bf'];
+const nf=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
+function show(t){tab=t;lastKey='';for(const k of['live','mt','lb']){$('#'+k).hidden=k!=t;$('#t-'+k).classList.toggle('on',k==t)}if(t!='live')loadBoard()}
+for(const k of['live','mt','lb'])$('#t-'+k).onclick=()=>show(k);
+async function loadBoard(){
+ const d=await api('/api/leaderboard'),col=n=>COL[d.rows.findIndex(r=>r.name==n)%COL.length];
+ $('#rows').innerHTML=d.rows.map((r,i)=>`<tr><td>${i+1}.<td>${r.name}<td class=n>${nf(r.points)}`).join('')||'<tr><td colspan=3 class=mute>Žiadni boti.';
+ const W=840,H=260,all=Object.values(d.series),len=Math.max(2,...all.map(s=>s.length)),mx=Math.max(1,...all.flat());
+ const grid=[0,.25,.5,.75,1].map(t=>`<line x1=0 x2=${W} y1=${H-t*H} y2=${H-t*H} stroke="#1e293b"/><text x=-6 y=${H-t*H+4} text-anchor=end fill="#94a3b8" font-size=11>${nf(mx*t)}</text>`).join('');
+ const path=s=>s.map((y,k)=>`${k?'L':'M'}${(k/(len-1)*W).toFixed(1)},${(H-y/mx*H).toFixed(1)}`).join('');
+ $('#chart').innerHTML=`<svg viewBox="-50 -10 ${W+60} ${H+20}">${grid}${Object.entries(d.series).map(([n,s])=>`<path d="${path(s)}" fill=none stroke="${col(n)}" stroke-width=2 />`).join('')}</svg><div class=legend>${d.rows.map(r=>`<span><i style="background:${col(r.name)}"></i>${r.name}</span>`).join('')}</div>`;
+ const as=d.avgseries,alen=Math.max(2,...Object.values(as).map(s=>s.length)),amx=Math.max(.01,...Object.values(as).flat()),H2=200;
+ const AX=k=>(k/(alen-1)*W).toFixed(1),AY=v=>(H2-v/amx*H2).toFixed(1);
+ const grid2=[0,.25,.5,.75,1].map(t=>`<line x1=0 x2=${W} y1=${AY(amx*t)} y2=${AY(amx*t)} stroke="#1e293b"/><text x=-6 y=${+AY(amx*t)+4} text-anchor=end fill="#94a3b8" font-size=11>${(amx*t).toFixed(2)}</text>`).join('');
+ $('#avgchart').innerHTML=`<svg viewBox="-50 -10 ${W+60} ${H2+20}">${grid2}${Object.entries(as).map(([n,s])=>`<path d="${s.map((v,k)=>(k?'L':'M')+AX(k)+','+AY(v)).join('')}" fill=none stroke="${col(n)}" stroke-width=2 />`).join('')}</svg>`;
+ const byAvg=[...d.rows].sort((a,b)=>b.avg50-a.avg50),am=Math.max(.01,...byAvg.map(r=>r.avg50));
+ $('#avg').innerHTML=byAvg.map(r=>`<div class=bar><span>${r.name}</span><div><i style="width:${r.avg50/am*100}%;background:${col(r.name)}"></i></div><b>${r.avg50.toFixed(2)}</b></div>`).join('');
+ $('#mrows').innerHTML=d.matches.map(m=>`<tr><td>${new Date(m.t*1000).toLocaleTimeString()}<td>${Object.entries(m.points).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`${n==m.winner?'<b>'+n+'</b>':n} <span class=mute>${p}</span>`).join(', ')}`).join('')||'<tr><td colspan=2 class=mute>Zatiaľ žiadne zápasy.';
+}
+function dbgList(){const on=new Set([...document.querySelectorAll('#dbgbots input:checked')].map(i=>i.value));
+ $('#dbgbots').innerHTML=S.bots.map(b=>`<label><input type=checkbox value="${b.name}" ${on.has(b.name)?'checked':''}> ${b.name}</label>`).join('')}
+function fillSel(){const n=S.bots.length;  // player-count selects: random, or any number up to all bots
+ for(const [id,lo] of [['#runp',2],['#opp',1]]){const el=$(id),old=el.value;
+  el.innerHTML='<option value="">random</option>'+Array.from({length:Math.max(0,n-lo+1)},(_,i)=>`<option>${lo+i}</option>`).join('');
+  if([...el.options].some(o=>o.value==old))el.value=old}}
+const debugGame=()=>post('/api/debug',{bots:[...document.querySelectorAll('#dbgbots input:checked')].map(i=>i.value),dice:+$('#dbgd').value||null}).then(r=>{cur=r.id;lastKey='';tick()}).catch(e=>alert(e.message));
+const dbgStep=()=>post('/api/game/'+cur+'/step').then(tick),dbgAuto=()=>post('/api/game/'+cur+'/auto').then(tick);
+show('live');tick();setInterval(tick,800);
+</script></body></html>
