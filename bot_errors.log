@@ -710,3 +710,78 @@ KeyboardInterrupt
 0.018280029296875
 0.0044939517974853516
 0.024075031280517578
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 276, in policy_weights
+    if alternative > best_alt:
+       ^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 326, in bid_value
+    value = sum(
+        weight * other_stats.bid_value(need - k, reward, loss)
+        for k, weight in enumerate(weights)
+    )
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 327, in <genexpr>
+    weight * other_stats.bid_value(need - k, reward, loss)
+             ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 151, in bid_value
+    return gain * (1 - self._cdf(need)) - self.expected_loss(need, own_loss_cap)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 148, in expected_loss
+    - (self._moment(need) - self._moment(a)))
+       ~~~~~~~~~~~~^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 140, in _moment
+    def _moment(self, threshold):
+    
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 279, in policy_weights
+    chance = 1 / (1 + math.exp(-sharpness * diff))
+                      ~~~~~~~~^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

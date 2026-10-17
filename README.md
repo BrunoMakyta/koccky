@@ -32,8 +32,8 @@ Prechod na jednotky
 Pri prechode z bežného čísla na jednotky musí byť nová ponuka väčšia než polovica pôvodného počtu.
 Príklady:
 Pôvodná ponukaNajnižšia ponuka na jednotky6 štvoriek4 jednotky7 pätiek4 jednotky8 šestiek5 jednotiek9 šestiek5 jednotiek10 dvojok6 jednotiek
-Pri návrate z jednotiek na bežné číslo musí byť nový počet aspoň dvojnásobok počtu jednotiek plus jedna.
-Napríklad: 5 jednotiek → minimálne 11 štvoriek (alebo iného čísla od 2 do 6).
+Pri návrate z jednotiek na bežné číslo musí byť nový počet aspoň dvojnásobok počtu jednotiek.
+Napríklad: 5 jednotiek → minimálne 10 štvoriek (alebo iného čísla od 2 do 6).
 5. Vykladanie a prehadzovanie kociek
 Ak hráč nechce okamžite povedať „Neverím!“ a chce si zmeniť svoje skryté kocky, môže využiť špeciálny ťah.
 Postup:

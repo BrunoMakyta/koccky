@@ -4,7 +4,7 @@ def raise_ok(old, new):
     (c, f), (n, g) = old, new
     if f != 1 and g != 1: return n > c or (n == c and g > f)
     if f != 1: return n > c // 2      # normal -> ones: more than half
-    if g != 1: return n >= 2 * c + 1  # ones -> normal: 2*count + 1
+    if g != 1: return n >= 2 * c      # ones -> normal: 2*count
     return n > c
 
 class Game:

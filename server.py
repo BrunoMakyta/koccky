@@ -1,4 +1,4 @@
-import json, os, queue, random, re, subprocess, sys, threading, time
+import gzip, json, os, queue, random, re, subprocess, sys, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 from engine import Game
@@ -8,9 +8,11 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 BOTS, STATS = os.path.join(ROOT, "bots"), os.path.join(ROOT, "stats.json")
 DICE_RANGE = (3, 10)  # každá hra dostane náhodný počet kociek na hráča z tohto rozsahu
 MAX_KOCAK_V_HRE = 50
-cfg = dict(interval=45, delay=0.4)  # interval: seconds between scheduled games (0 = paused)
+cfg = dict(delay=0)  # Run bot games continuously; replay speed is controlled in the browser.
 games, lock = {}, threading.Lock()
 
+REPLAYS = os.path.join(ROOT, "replays")
+os.makedirs(REPLAYS, exist_ok=True)
 HIST = os.path.join(ROOT, "history.json")
 history = json.load(open(HIST)) if os.path.exists(HIST) else []  # one record per finished game
 bots = lambda: sorted(f[:-3] for f in os.listdir(BOTS) if f.endswith(".py"))
@@ -46,6 +48,14 @@ def finish(m):  # points = place counted from the bottom: first out 0 ... winner
     order = out + rest + [g.winner]
     rec = dict(id=m["id"], t=m["t"], names=g.names, winner=g.names[g.winner],
                points={g.names[i]: k for k, i in enumerate(order)})
+    # Store a compact, persistent replay before exposing the match in history.
+    if m["frames"] is not None:
+        path = os.path.join(REPLAYS, m["id"] + ".json.gz")
+        tmp = path + ".tmp"
+        with gzip.open(tmp, "wt", encoding="utf-8") as f:
+            json.dump({"id": m["id"], "status": "finished", "frames": m["frames"]},
+                      f, separators=(",", ":"))
+        os.replace(tmp, path)
     with lock:
         history.append(rec); json.dump(history, open(HIST, "w"))
 
@@ -63,6 +73,25 @@ def leaderboard():
     for x in out:
         l = x.pop("last")[-50:]; x["avg50"] = sum(l) / len(l) if l else 0
     return dict(rows=out, series={n: v[-200:] for n, v in series.items()}, avgseries={n: v[-200:] for n, v in avgs.items()}, matches=history[-50:][::-1])
+
+def matches_page(offset=0, limit=40):
+    # Page through all recorded matches, newest first (without loading them all in the browser).
+    with lock:
+        count = len(history)
+        page = list(history[max(0, count-offset-limit):max(0, count-offset)])[::-1]
+    return {"total": count, "offset": offset, "matches": [
+        {**r, "replay": os.path.isfile(os.path.join(REPLAYS, r["id"] + ".json.gz"))}
+        for r in page]}
+
+
+def replay_frame(g, action=None):
+    """Freeze a spectator view after each action for browser playback."""
+    return dict(names=g.names, you=None, turn=g.turn, round=g.round,
+                bid=g.bid[:] if g.bid is not None else None, bidder=g.bidder,
+                must_raise=g.must_raise, shown=[h[:] for h in g.shown],
+                hidden_counts=[len(h) for h in g.hidden],
+                all_hidden=[h[:] for h in g.hidden], winner=g.winner,
+                log=g.log[-60:].copy(), action=action)
 
 def run_game(gid):
     m = games[gid]; g, h = m["game"], m["human"]
@@ -91,39 +120,81 @@ def run_game(gid):
                 m["trace"] = dict(n=m["n"], bot=g.names[i], response=a, note=note,
                                   state={**{k: x for k, x in v.items() if k not in ("log", "legal_bids")},
                                          "legal_bids": f"{len(v['legal_bids'])} options, lowest {v['legal_bids'][:2]}"})
+                if m["frames"] is not None:
+                    m["frames"].append(replay_frame(g, dict(bot=g.names[i], response=a, note=note)))
         if not m.get("debug"): finish(m)  # debug games don't count for the leaderboard
         m["status"] = "finished"
     finally:
         for p in procs.values(): p.close()
 
-def start(opp=None, human=False, pick=None, dice=None):
-    avail = bots(); lo = 1 if human else 2   # lo = minimálny počet botov (spolu aspoň 2 hráči)
-    k = min(len(avail), max(lo, opp) if opp else random.randint(lo, max(lo, min(len(avail), 10))))  # ľubovoľný počet, max. všetci boti no max bde 10
-    if k < lo: return None
-    names = random.sample(avail, k) + (["You"] if human else []); random.shuffle(names)
-    if pick: names = list(pick)
-    dice = min(max(3, MAX_KOCAK_V_HRE//k), max(1, int(dice) if dice else random.randint(*DICE_RANGE)))
+def start(opp=None, human=False, pick=None, dice=None, chosen_bots=None):
+    """Create a game. In human games choose 1-9 specific or random opponents.
+
+    The total number of starting dice across all players must not exceed 50.
+    """
+    available = bots()
+    if pick is not None:                 # Preserve debug-game seating order.
+        names = list(pick)
+    elif human and chosen_bots is not None:
+        if not isinstance(chosen_bots, list) or not 1 <= len(chosen_bots) <= 9:
+            raise ValueError("Choose between 1 and 9 bots")
+        if len(set(chosen_bots)) != len(chosen_bots):
+            raise ValueError("Each bot can be selected only once")
+        if any(n not in available for n in chosen_bots):
+            raise ValueError("One or more selected bots are no longer available")
+        names = list(chosen_bots) + ["You"]
+        random.shuffle(names)
+    else:
+        minimum = 1 if human else 2
+        maximum = min(len(available), 9) if human else len(available)
+        if maximum < minimum:
+            return None
+        if opp is None or opp == "":
+            count = random.randint(minimum, maximum if human else min(maximum, 10))
+        else:
+            if type(opp) is not int or not minimum <= opp <= maximum:
+                raise ValueError(f"Choose between {minimum} and {maximum} bot opponents")
+            count = opp
+        names = random.sample(available, count) + (["You"] if human else [])
+        random.shuffle(names)
+
+    if len(names) < 2:
+        return None
+    maximum_dice = MAX_KOCAK_V_HRE // len(names)
+    if dice is None or dice == "":
+        low, high = min(DICE_RANGE[0], maximum_dice), min(DICE_RANGE[1], maximum_dice)
+        dice = random.randint(low, high)
+    else:
+        if type(dice) is not int or not 1 <= dice <= maximum_dice:
+            raise ValueError(f"Choose 1 to {maximum_dice} dice per player ({MAX_KOCAK_V_HRE} total maximum)")
+
     gid = str(int(time.time() * 1000))
-    games[gid] = dict(id=gid, names=names, human=names.index("You") if human else None, status="running",
-                      lock=threading.Lock(), game=Game(names, dice), dice=dice, t=time.time(), last_act=time.time(),
-                      debug=bool(pick), go=threading.Event())
+    g = Game(names, dice)
+    with lock:
+        games[gid] = dict(id=gid, names=names, human=names.index("You") if human else None, status="running",
+                          lock=threading.Lock(), game=g, dice=dice, t=time.time(), last_act=time.time(),
+                          debug=bool(pick), go=threading.Event(),
+                          frames=[replay_frame(g)] if not human and not pick else None)
+        for old in sorted(games, reverse=True)[25:]:
+            if games[old]["status"] != "running": del games[old]
     threading.Thread(target=run_game, args=(gid,), daemon=True).start()
-    for old in sorted(games, reverse=True)[25:]:
-        if games[old]["status"] != "running": del games[old]
     return gid
 
 def scheduler():
-    last = 0
     while True:
-        time.sleep(1)
-        if cfg["interval"] > 0 and time.time() - last >= cfg["interval"] and not any(
-                 m["status"] == "running" and m["human"] is None and not m.get("debug") for m in games.values()):
-            if start(): last = time.time()
+        with lock:
+            running = any(m["status"] == "running" and m["human"] is None and not m["debug"]
+                          for m in games.values())
+        if not running:
+            start()  # Immediately start the next bot match when the previous one ends.
+        time.sleep(0.2)
 
 def state():
-    gl = sorted(games.values(), key=lambda m: m["t"], reverse=True)
+    with lock:
+        gl = sorted(games.values(), key=lambda m: m["t"], reverse=True)
     return dict(cfg=cfg, bots=[dict(name=r["name"], games=r["games"], wins=r["wins"]) for r in leaderboard()["rows"]],
-                games=[dict(id=m["id"], names=m["names"], status=m["status"], debug=m.get("debug", False), dice=m["dice"],
+                games=[dict(id=m["id"], names=m["names"], status=m["status"], debug=m.get("debug", False),
+                            replay=m["frames"] is not None, dice=m["dice"],
                             winner=None if m["game"].winner is None else m["names"][m["game"].winner]) for m in gl])
 
 class H(BaseHTTPRequestHandler):
@@ -139,12 +210,29 @@ class H(BaseHTTPRequestHandler):
         if path == "/": return self.reply(open(os.path.join(ROOT, "index.html"), "rb").read(), ctype="text/html; charset=utf-8")
         if path == "/api/state": return self.reply(state())
         if path == "/api/leaderboard": return self.reply(leaderboard())
+        if path == "/api/matches":
+            q = parse_qs(urlparse(self.path).query)
+            offset = max(0, int(q.get("offset", ["0"])[0]))
+            return self.reply(matches_page(offset))
         if path == "/api/template":  # NOVÉ: stiahnutie default bota ako def.py
             body = open(os.path.join(BOTS, "def.py"), "rb").read()
             self.send_response(200); self.send_header("Content-Type", "text/x-python; charset=utf-8")
             self.send_header("Content-Disposition", 'attachment; filename="def.py"')
             self.send_header("Content-Length", str(len(body))); self.end_headers()
             return self.wfile.write(body)
+        if p[:2] == ["api", "game"] and len(p) == 4 and p[3] == "replay":
+            gid = p[2]
+            if not re.fullmatch(r"[0-9]+", gid):
+                return self.reply({"error": "Invalid match ID"}, 400)
+            m = games.get(gid)
+            if m is not None and m["frames"] is not None:
+                with m["lock"]:
+                    return self.reply({"id": m["id"], "status": m["status"], "frames": m["frames"]})
+            path = os.path.join(REPLAYS, gid + ".json.gz")
+            if os.path.isfile(path):
+                with gzip.open(path, "rt", encoding="utf-8") as f:
+                    return self.reply(json.load(f))
+            return self.reply({"error": "No recorded replay for this match (old matches cannot be reconstructed)"}, 404)
         if p[:2] == ["api", "game"] and len(p) == 3 and p[2] in games:
             m = games[p[2]]; g, h = m["game"], m["human"]
             with m["lock"]:
@@ -164,10 +252,6 @@ class H(BaseHTTPRequestHandler):
             elif u.path == "/api/delete":
                 name = q.get("name", [""])[0]
                 if name in bots(): os.remove(os.path.join(BOTS, name + ".py"))
-            elif u.path == "/api/config":
-                j = json.loads(self.body())
-                cfg["interval"] = max(0, int(j.get("interval", cfg["interval"])))
-
             elif u.path == "/api/debug":
                 j = json.loads(self.body())
                 pick = list(dict.fromkeys(n for n in j.get("bots", []) if n in bots()))
@@ -175,7 +259,8 @@ class H(BaseHTTPRequestHandler):
                 return self.reply({"id": start(pick=pick, dice=j.get("dice"))})
             elif u.path in ("/api/run", "/api/play"):
                 j = json.loads(self.body() or "{}")
-                gid = start(j.get("opponents"), human=u.path == "/api/play", dice=j.get("dice"))
+                gid = start(j.get("opponents"), human=u.path == "/api/play", dice=j.get("dice"),
+                            chosen_bots=j.get("bots") if u.path == "/api/play" and "bots" in j else None)
 
                 if not gid: raise ValueError("Upload more bots first (2 for bot games, 1 to play against)")
                 return self.reply({"id": gid})
