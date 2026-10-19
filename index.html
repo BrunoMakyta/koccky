@@ -42,10 +42,63 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:.55rem .
 #playBots input{flex:none;accent-color:var(--brass)}
 #playBotCount,#playDiceHint{font-size:.82rem;color:var(--mute)}
 #playError{font-size:.87rem}
+.bot-tools{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;margin:1.1rem 0 .9rem}
+.bot-tools label,.bot-tools a{font-size:.86rem}
+.bot-tools input[type=file]{display:block;width:205px;max-width:100%;padding:.3rem .35rem;border-color:#475569;font-size:.82rem}
+.bot-tools input[type=file]::file-selector-button{font:inherit;font-size:.82rem;padding:.2rem .35rem;margin-right:.35rem;color:var(--ivory);background:#263447;border:1px solid #64748b;border-radius:.25rem;cursor:pointer}
+.avg-settings{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;margin:.5rem 0 1rem;color:var(--mute);font-size:.92rem}
+.avg-settings select{min-width:7rem}
+.bot-dot{display:inline-block;width:.65rem;height:.65rem;border-radius:50%;margin-right:.55rem;vertical-align:middle}
+.rate-note{margin:-.2rem 0 1rem;color:var(--mute);font-size:.88rem}
 
-@media(max-width:800px){#live{grid-template-columns:1fr}.bar{grid-template-columns:6rem 1fr 3.5rem}}
+.auth-overlay{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:2rem 1rem;background:radial-gradient(circle at 50% 12%,#1e3a5f,var(--deep) 70%)}
+.auth-card{width:min(100%,430px);background:#111d30;border:1px solid #334155;border-radius:1rem;padding:2rem;box-shadow:0 18px 60px #0006}
+.auth-card h1{margin:0 0 .5rem}.auth-card label{display:block;color:var(--mute);font-size:.9rem;margin:.8rem 0 .25rem}
+.auth-card input{display:block;width:100%;background:#0b1220}.auth-card button[type=submit]{width:100%;margin-top:1rem}
+.auth-switch{display:flex;gap:.65rem;margin:1.1rem 0}.auth-switch button{flex:1}.auth-switch button.on{background:var(--brass);color:var(--ink)}
+#authHelp{font-size:.84rem;margin-top:1rem}.auth-card .err{margin-top:.6rem}
+header{gap:1.3rem}header nav{display:flex;flex-wrap:wrap}#accountMenu{margin-left:auto;display:flex;align-items:center;gap:.8rem;font-size:.86rem}
+#accountMenu button{padding:.25rem .5rem;border-color:#475569}
+.league-switch{display:flex;flex-wrap:wrap;gap:.55rem;margin:1.2rem 0 .5rem}.league-switch button.on{background:var(--brass);color:var(--ink)}
+.league-note{color:var(--mute);font-size:.9rem;margin:0 0 1.3rem}
+.profile-head{padding:1rem 1.1rem;background:#152338;border:1px solid #334155;border-radius:.65rem;margin-top:1rem}
+.profile-head strong{color:var(--brass)}.profile-stats{display:flex;flex-wrap:wrap;gap:1.4rem;padding:.5rem 0}
+.profile-stats div{display:flex;flex-direction:column;gap:.12rem}.profile-stats strong{font-size:1.4rem}.profile-stats small{color:var(--mute)}
+.profile-actions{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}.profile-actions button{padding:.25rem .55rem;font-size:.8rem}
+.profile-actions .destructive{border-color:var(--red);color:#fbb3a4}
+#profileTable{overflow-x:auto}.profile-table{min-width:750px}.profile-table td:first-child{width:auto;color:var(--ivory)}
+.profile-table small{color:var(--mute);display:block}.profile-table th,.profile-table td{padding:.6rem .5rem}
+.profile-tools{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin:.8rem 0}
+.profile-tools input[type=file]{font-size:.9rem;max-width:240px}
+#legacyAdmin{border:1px solid #334155;border-radius:.5rem;padding:1rem;margin-top:1.2rem}
+#legacyAdmin select{max-width:100%;margin:.45rem 0}
+@media(max-width:800px){#live{grid-template-columns:1fr}.bar{grid-template-columns:6rem 1fr 3.5rem}header{height:auto;min-height:3.2rem;flex-wrap:wrap;padding:.4rem 1rem;gap:.1rem 1rem}header nav a{line-height:2.2rem}#accountMenu{width:100%;margin-left:0;justify-content:flex-end}}
+
 </style></head><body>
-<header><b>Liar's Dice<small>Programátorský boj</small></b><nav><a id=t-live>Live</a><a id=t-mt>Zápasy</a><a id=t-lb>Leaderboard</a></nav></header>
+<div id=authGate class=auth-overlay>
+ <div class=auth-card>
+  <h1>Liar's Dice</h1><div class=mute>Programátorský boj · používateľské účty</div>
+  <div class=auth-switch>
+   <button type=button id=loginTab class=on onclick="switchAuth('login')">Prihlásiť sa</button>
+   <button type=button id=registerTab onclick="switchAuth('register')">Registrácia</button>
+  </div>
+  <form id=authForm onsubmit="submitAuth(event)">
+   <label for=authName>Používateľské meno</label>
+   <input id=authName autocomplete=username required maxlength=24 placeholder="napr. dominik">
+   <label for=authPassword>Heslo</label>
+   <input id=authPassword type=password autocomplete=current-password required minlength=8 maxlength=128>
+   <div id=inviteWrap hidden><label for=authInvite>Registračný kód od organizátora</label>
+    <input id=authInvite autocomplete=off placeholder="Kód zo servera"></div>
+   <button class=p type=submit id=authSubmit>Prihlásiť sa</button>
+   <div class=err id=authError role=alert></div>
+  </form>
+  <p id=authHelp class=mute>Pre registráciu potrebuješ kód od organizátora. Boti v Pythone sa spúšťajú na serveri, preto registráciu povoľuj iba dôveryhodným ľuďom.</p>
+ </div>
+</div>
+<div id=appRoot hidden>
+<header><b>Liar's Dice<small>Programátorský boj</small></b><nav><a id=t-live>Live</a><a id=t-mt>Zápasy</a><a id=t-lb>Leaderboard</a><a id=t-profile>Môj profil</a></nav>
+ <span id=accountMenu><strong id=accountName></strong><button onclick="logout()">Odhlásiť sa</button></span>
+</header>
 <div id=live>
 <aside>
 <button class=p onclick="run()">Run a bot game now</button>
@@ -81,11 +134,14 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:.55rem .
  <button id=playStart class=p onclick="play()">Spustiť hru</button>
  <div id=playError class=err role=alert></div>
 </div>
+<div class=bot-tools>
+ <label class=mute for=up>Upload bot (.py)</label>
+ <input type=file id=up accept=.py multiple>
+ <a href="/api/template" download="def.py">Stiahnu&#357; default bota</a>
+</div>
 <h2>Bots <small class=mute>(wins / games)</small></h2>
 <div id=bots></div>
-<p><label class=mute>Upload bot (.py) <input type=file id=up accept=.py multiple></label></p>
-<p><a href="/api/template" download="def.py">Stiahnuť default bota</a></p>
-<p class=mute>Bot games run continuously. Live automatically replays the newest completed game (about <span id=replayStepDisplay></span> seconds per action).</p>
+<p class=mute>Simulácia beží automaticky v ligách s aspoň 2 botmi. Live prehráva posledný zápas (<span id=replayStepDisplay></span> s na ťah).</p>
 <h2>Games</h2><div id=games></div>
 </aside>
 <main>
@@ -94,10 +150,31 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:.55rem .
 </main>
 </div>
 <div class=page id=lb hidden>
-<h2>Graf skóre</h2><div id=chart></div>
-<h2>Priemerné skóre za posledných 50 hier</h2><div id=avgchart></div><div id=avg></div>
 <h2>Leaderboard</h2>
+<div class=league-switch>
+ <button id=leagueCompetitive class=on onclick="chooseLeague('competitive')">🏆 Súťažný</button>
+ <button id=leagueNoncompetitive onclick="chooseLeague('noncompetitive')">Nesúťažný</button>
+</div>
+<p id=leagueNote class=league-note></p>
+<h2>Graf sk&#243;re</h2><div id=chart></div>
+<h2>Priemern&#233; sk&#243;re za posledn&#253;ch <span id=avgWindowLabel>50</span> hier</h2>
+<div class=avg-settings>
+ <label for=avgWindow>Po&#269;et hier na priemer:</label>
+ <select id=avgWindow onchange="loadBoard()">
+  <option value=25>25</option><option value=50 selected>50</option>
+  <option value=75>75</option><option value=100>100</option>
+  <option value=150>150</option><option value=200>200</option>
+  <option value=250>250</option><option value=300>300</option>
+  <option value=400>400</option><option value=500>500</option>
+ </select>
+ <span>Posledn&#233; hry ka&#382;d&#233;ho bota zvl&#225;&#353;&#357;</span>
+</div>
+<div id=avgchart></div><div id=avg></div>
+<h2>Leaderboard &ndash; celkov&#233; body</h2>
 <table><thead><tr><th>#<th>Bot<th class=n>Body</thead><tbody id=rows></tbody></table>
+<h2>Leaderboard &ndash; body na hru</h2>
+<p class=rate-note>Celkov&#233; body / po&#269;et odohran&#253;ch hier. Zoraden&#233; pod&#318;a bodov na hru.</p>
+<table><thead><tr><th>#<th>Bot<th class=n>Body/hra<th class=n>Body<th class=n>Hry</thead><tbody id=rateRows></tbody></table>
 </div>
 <div class=page id=mt hidden>
 <h2>Zápasy</h2>
@@ -119,17 +196,84 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:.55rem .
 <span id=matchesCount></span>
 <button onclick="moveMatches(1)" id=matchesNext>Staršie ▶</button></div>
 </div>
+<div class=page id=profile hidden>
+ <h2>Môj profil · <span id=profileUsername></span></h2>
+ <div class=profile-head><strong id=profileCompSummary></strong>
+  <div id=profileTotals class=profile-stats></div>
+ </div>
+ <h2>Moji boti</h2>
+ <p class=mute>Na účte môžeš mať ľubovoľný počet botov, ale najviac jedného označeného ako súťažný. Pri označení nového súťažného bota sa pôvodný automaticky odhlási zo súťaže.</p>
+ <div class=profile-tools>
+  <label>Nahrať .py bota: <input type=file id=profileUp accept=.py multiple></label>
+  <a href="/api/template" download="def.py">Stiahnuť default bota</a>
+ </div>
+ <div id=profileTable><table class=profile-table><thead><tr><th>Bot</th><th>Režim</th><th class=n>Hry</th><th class=n>Výhry</th><th class=n>Body</th><th class=n>Body/hra</th><th>Správa</th></tr></thead>
+ <tbody id=profileBots></tbody></table></div>
+ <p id=profileNote class=mute></p>
+ <div id=legacyAdmin hidden><b>Prevzatie starších botov</b>
+  <p class=mute>Prvý účet môže prevziať pôvodné súbory botov, ktoré ešte nemajú vlastníka. Ostatné účty ich nemôžu prevziať.</p>
+  <select id=legacySelect></select> <button onclick="claimLegacy()">Prevziať vybraného bota</button>
+ </div>
+</div>
+</div>
 <script>
 const $=s=>document.querySelector(s);
 const REPLAY_STEP_MS=1500;
 $('#replayStepDisplay').textContent=REPLAY_STEP_MS/1000;
 let tab='live',botKey='',dbgKey='',cur=null,S=null,V=null,lastKey='',sel=new Set();
+let USER=null,authMode='login',timersStarted=false,leagueMode='competitive';
 let follow=true,replay=null,replayIndex=0,replayAt=0,polling=false;
 let matchData=null,matchIndex=0,matchTimer=null,matchOffset=0,matchLoadId=0;
 const api=async(p,o)=>{const r=await fetch(p,o),j=await r.json();if(j.error)throw new Error(j.error);return j};
-const post=(p,b)=>api(p,{method:'POST',body:JSON.stringify(b||{})});
+const post=(p,b)=>api(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const botDisplay=n=>{const b=S?.bots.find(b=>b.name===n);return b?b.display+(b.owner?' @'+b.owner:''):n};
+function switchAuth(mode){
+ authMode=mode;
+ $('#loginTab').classList.toggle('on',mode==='login');
+ $('#registerTab').classList.toggle('on',mode==='register');
+ $('#inviteWrap').hidden=mode!=='register';
+ $('#authSubmit').textContent=mode==='login'?'Prihlásiť sa':'Vytvoriť účet';
+ $('#authPassword').autocomplete=mode==='login'?'current-password':'new-password';
+ $('#authError').textContent='';
+}
+async function submitAuth(event){
+ event.preventDefault();$('#authError').textContent='';
+ const username=$('#authName').value.trim(),password=$('#authPassword').value;
+ $('#authSubmit').disabled=true;
+ try{
+  const payload={username,password};
+  if(authMode==='register')payload.invite=$('#authInvite').value.trim();
+  const r=await post('/api/auth/'+(authMode==='login'?'login':'register'),payload);
+  $('#authPassword').value='';$('#authInvite').value='';enterApp(r.user);
+ }catch(e){$('#authError').textContent=e.message}
+ finally{$('#authSubmit').disabled=false}
+}
+function enterApp(user){
+ USER=user;$('#accountName').textContent='@'+user.username;
+ $('#authGate').hidden=true;$('#appRoot').hidden=false;
+ show('live');tick();
+ if(!timersStarted){timersStarted=true;setInterval(tick,800);
+  setInterval(()=>{if(tab==='mt'&&matchOffset===0)loadMatches();if(tab==='profile')loadProfile()},10000);
+ }
+}
+async function initAuth(){
+ try{const r=await api('/api/auth/me');if(r.user)enterApp(r.user)}
+ catch(e){$('#authError').textContent='Nepodarilo sa spojiť so serverom: '+e.message}
+}
+async function logout(){
+ try{await post('/api/auth/logout',{})}catch(e){alert(e.message);return}
+ window.location.reload();
+}
 const face=f=>f==1?'ones':f+'s';
 const die=(d,c='',a='')=>`<span class="die ${d==1?'one':''} ${c}" ${a}>${d}</span>`;
+// Always show revealed dice first, then hidden dice; sort each group from 1 to 6.
+// Keep original indices on selectable dice, since the game API expects those indices.
+const sortedDice=ds=>[...(ds||[])].sort((a,b)=>a-b);
+const shownDiceHtml=ds=>sortedDice(ds).map(d=>die(d,'pub')).join('');
+const hiddenDiceHtml=ds=>sortedDice(ds).map(d=>die(d)).join('');
+const yourDiceHtml=ds=>(ds||[]).map((d,k)=>({d,k})).sort((a,b)=>a.d-b.d||a.k-b.k)
+ .map(({d,k})=>die(d,'mine'+(sel.has(k)?' sel':''),`data-k=${k} tabindex=0`)).join('');
 async function loadReplay(id){
  const data=await api('/api/game/'+id+'/replay');
  if(!follow)return;  // A manual game may have been selected while the request was pending.
@@ -181,16 +325,16 @@ async function tick(){
 function selectGame(id){follow=false;replay=null;cur=id;lastKey='';sel.clear();tick()}
 function resumeReplay(){follow=true;replay=null;cur=null;lastKey='';tick()}
 function side(){
- const bk=S.bots.map(b=>b.name).sort().join('\0');if(bk!=botKey){botKey=bk;dbgList();fillSel()}
- $('#bots').innerHTML=S.bots.length?S.bots.map(b=>`<div class=bot><span>${b.name}</span><span class=mute>${b.wins} / ${b.games}</span></div>`).join(''):'<p class=mute>No bots yet. Upload a .py file with a decide(state) function.</p>';
- $('#games').innerHTML=S.games.map(g=>`<div class="g ${g.id==cur?'on':''}" onclick="selectGame('${g.id}')">${g.debug?'[debug] ':''}${g.names.join(', ')}<small>${g.dice} dice · ${g.status}${g.winner?' – '+g.winner+' won':''}</small></div>`).join('')||'<p class=mute>No games yet.</p>';
+ const bk=S.bots.map(b=>b.name+':'+b.competitive).sort().join('\0');if(bk!=botKey){botKey=bk;dbgList();fillSel()}
+ $('#bots').innerHTML=S.bots.length?S.bots.map(b=>`<div class=bot><span>${b.competitive?'🏆 ':''}${esc(b.display)}${b.owner?`<small class=mute> @${esc(b.owner)}</small>`:''}</span><span class=mute>${b.wins} / ${b.games}</span></div>`).join(''):'<p class=mute>Zatiaľ nie sú žiadni boti. Nahraj .py súbor s funkciou decide(state).</p>';
+ $('#games').innerHTML=S.games.map(g=>`<div class="g ${g.id==cur?'on':''}" onclick="selectGame('${g.id}')">${g.debug?'[debug] ':''}${g.names.map(n=>esc(n)).join(', ')}<small>${g.league==='competitive'?'🏆 súťažný · ':''}${g.dice} dice · ${g.status}${g.winner?' – '+esc(g.winner)+' won':''}</small></div>`).join('')||'<p class=mute>No games yet.</p>';
 }
 function game(){
  const v=V,me=v.you,over=v.winner!=null||v.status=='abandoned',mine=me!=null&&v.turn==me&&!over;
  $('#table').innerHTML=v.names.map((nm,i)=>{
   const out=!v.shown[i].length&&!v.hidden_counts[i];
-  const pub=v.shown[i].map(d=>die(d,'pub')).join('');
-  const hid=v.all_hidden?v.all_hidden[i].map(d=>die(d)).join(''):i===me?v.your_dice.map((d,k)=>die(d,'mine'+(sel.has(k)?' sel':''),`data-k=${k} tabindex=0`)).join(''):Array(v.hidden_counts[i]).fill(0).map(()=>die('?','back')).join('');
+  const pub=shownDiceHtml(v.shown[i]);
+  const hid=v.all_hidden?hiddenDiceHtml(v.all_hidden[i]):i===me?yourDiceHtml(v.your_dice):Array(v.hidden_counts[i]).fill(0).map(()=>die('?','back')).join('');
   return `<div class="row ${v.turn==i&&!over?'turn':''} ${out?'out':''}"><b class=nm>${nm}</b><span>${pub}${hid}</span></div>`}).join('');
  $('#info').innerHTML=v.winner!=null?`<span class=bid>${v.names[v.winner]} wins</span>`:v.status=='abandoned'?'Game abandoned.':
   `Round ${v.round} – `+(v.bid?`${v.names[v.bidder]} bid <span class=bid>${v.bid[0]} × ${face(v.bid[1])}</span>`:`no bid yet, ${v.names[v.turn]} opens`);
@@ -204,9 +348,9 @@ function game(){
   :(over||me==null)?'':`<p class=mute>Waiting for ${v.names[v.turn]}…</p>`}
  if(v.debug){const t=v.trace,k=[v.id,t?t.n:0,v.status,v.auto,v.turn].join();
   if(k!=dbgKey){dbgKey=k;$('#dbg').innerHTML='<b>Debug game</b> – '+(over?'finished.':v.auto?'running to the end…':`next: <b>${v.names[v.turn]}</b> <button class=p onclick="dbgStep()">Next action ▶</button> <button onclick="dbgAuto()">Run to end</button>`)
-   +(t?`<p>Last: <b>${t.bot}</b> → <code>${JSON.stringify(t.response)}</code> ${t.note?'<span class=err>'+t.note+'</span>':''}</p><details><summary class=mute>State the bot saw</summary><pre>${JSON.stringify(t.state,null,1)}</pre></details>`:'<p class=mute>No action yet – click "Next action".</p>')}
+   +(t?`<p>Last: <b>${esc(t.bot)}</b> → <code>${esc(JSON.stringify(t.response))}</code> ${t.note?'<span class=err>'+esc(t.note)+'</span>':''}</p><details><summary class=mute>State the bot saw</summary><pre>${esc(JSON.stringify(t.state,null,1))}</pre></details>`:'<p class=mute>No action yet – click "Next action".</p>')}
  }else{dbgKey='';if($('#dbg').innerHTML)$('#dbg').innerHTML=''}
- $('#log').innerHTML=v.log.slice().reverse().map(l=>`<div>${l}</div>`).join('');
+ $('#log').innerHTML=v.log.slice().reverse().map(l=>`<div>${esc(l)}</div>`).join('');
 }
 $('#table').onclick=e=>{const d=e.target.closest('.mine');if(!d)return;const k=+d.dataset.k;sel.has(k)?sel.delete(k):sel.add(k);d.classList.toggle('sel')};
 const act=async a=>{try{await post('/api/game/'+cur+'/act',a);tick()}catch(e){$('#err').textContent=e.message}};
@@ -225,8 +369,59 @@ async function play(){
  try{const r=await post('/api/play',payload);selectGame(r.id)}
  catch(e){$('#playError').textContent=e.message}
 }
-const del=n=>post('/api/delete?name='+n).then(tick);
-$('#up').onchange=async e=>{for(const f of e.target.files){try{await api('/api/upload?name='+encodeURIComponent(f.name),{method:'POST',body:f})}catch(x){alert(f.name+': '+x.message)}}e.target.value='';tick()};
+async function handleBotUpload(e){
+ for(const f of e.target.files){
+  try{await api('/api/upload?name='+encodeURIComponent(f.name),{method:'POST',body:f})}
+  catch(x){alert(f.name+': '+x.message)}
+ }
+ e.target.value='';await tick();if(tab==='profile')loadProfile();
+}
+$('#up').onchange=handleBotUpload;
+$('#profileUp').onchange=handleBotUpload;
+async function markCompetitive(name,enabled){
+ if(enabled&& !confirm('Označiť tohto bota za súťažného? Ak už súťažného máš, pôvodný sa automaticky odhlási.'))return;
+ try{await post('/api/bots/competitive',{name,competitive:enabled});await tick();await loadProfile();if(tab==='lb')loadBoard()}
+ catch(e){alert(e.message)}
+}
+async function deleteOwnBot(name){
+ if(!confirm('Naozaj vymazať '+name+'? Záznamy zápasov zostanú zachované.'))return;
+ try{await post('/api/delete?name='+encodeURIComponent(name),{});await tick();await loadProfile()}
+ catch(e){alert(e.message)}
+}
+async function claimLegacy(){
+ const name=$('#legacySelect').value;if(!name)return;
+ if(!confirm('Prevziať pôvodného bota '+name+' pod svoj účet?'))return;
+ try{await post('/api/bots/claim',{name});await tick();await loadProfile()}
+ catch(e){alert(e.message)}
+}
+async function loadProfile(){
+ if(tab!=='profile'||!USER)return;
+ try{
+  const p=await api('/api/profile');if(tab!=='profile')return;
+  $('#profileUsername').textContent='@'+p.user.username;
+  const games=p.bots.reduce((s,b)=>s+b.games,0),wins=p.bots.reduce((s,b)=>s+b.wins,0),points=p.bots.reduce((s,b)=>s+b.points,0);
+  $('#profileCompSummary').textContent=p.competitive_bot
+    ?'Súťažný bot: '+p.bots.find(b=>b.name===p.competitive_bot)?.display
+    :'Zatiaľ nemáš označeného súťažného bota';
+  $('#profileTotals').innerHTML=`<div><strong>${p.total_bots}</strong><small>mojich botov</small></div>`+
+   `<div><strong>${nf(games)}</strong><small>odohraných hier</small></div>`+
+   `<div><strong>${nf(wins)}</strong><small>výhier</small></div>`+
+   `<div><strong>${nf(points)}</strong><small>získaných bodov</small></div>`;
+  $('#profileBots').innerHTML=p.bots.map(b=>`<tr>
+   <td><b>${esc(b.display)}</b><small>${esc(b.name)}</small></td>
+   <td>${b.competitive?'🏆 Súťažný':'Nesúťažný'}</td>
+   <td class=n>${nf(b.league_games)}</td><td class=n>${nf(b.league_wins)}</td>
+   <td class=n>${nf(b.league_points)}</td><td class=n>${b.league_points_per_game.toFixed(3)}</td>
+   <td><div class=profile-actions>
+    <button onclick="markCompetitive('${b.name}',${!b.competitive})">${b.competitive?'Odhlásiť zo súťaže':'Nastaviť súťažný'}</button>
+    <a href="/api/bot/${encodeURIComponent(b.name)}/download" download="${esc(b.display)}.py">Stiahnuť</a>
+    <button class=destructive onclick="deleteOwnBot('${b.name}')">Vymazať</button>
+   </div></td></tr>`).join('')||'<tr><td colspan=7 class=mute>Nemáš žiadnych botov. Nahraj prvý súbor .py.</td></tr>';
+  $('#profileNote').textContent='Tabuľka zobrazuje aktuálnu ligu daného bota. Celkové štatistiky profilu zahŕňajú aj jeho staršie hry z inej ligy. Pri zmene ligy sa staré výsledky do novej ligy neprenášajú.';
+  $('#legacyAdmin').hidden=!p.admin||!p.legacy.length;
+  $('#legacySelect').innerHTML=p.legacy.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+ }catch(e){$('#profileNote').textContent='Nepodarilo sa načítať profil: '+e.message}
+}
 // Each bot gets its own consistent color in every leaderboard visualization.
 // The first 24 use a curated palette; extra bots receive additional unique hues.
 const COL=[
@@ -236,13 +431,34 @@ const COL=[
  '#d9f99d','#f0abfc','#fca5a5','#5eead4','#bef264','#93c5fd'
 ];
 const nf=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
-function show(t){tab=t;lastKey='';for(const k of['live','mt','lb']){$('#'+k).hidden=k!=t;$('#t-'+k).classList.toggle('on',k==t)}if(t==='lb')loadBoard();if(t==='mt')loadMatches();else pauseMatch()}
-for(const k of['live','mt','lb'])$('#t-'+k).onclick=()=>show(k);
+function show(t){
+ tab=t;lastKey='';
+ for(const k of ['live','mt','lb','profile']){
+  $('#'+k).hidden=k!==t;$('#t-'+k).classList.toggle('on',k===t);
+ }
+ if(t==='lb')loadBoard();
+ if(t==='mt')loadMatches();else pauseMatch();
+ if(t==='profile')loadProfile();
+}
+for(const k of ['live','mt','lb','profile'])$('#t-'+k).onclick=()=>show(k);
+function chooseLeague(t){
+ leagueMode=t;
+ $('#leagueCompetitive').classList.toggle('on',t==='competitive');
+ $('#leagueNoncompetitive').classList.toggle('on',t==='noncompetitive');
+ loadBoard();
+}
 async function loadBoard(){
- const d=await api('/api/leaderboard');
+ const windowSize=Number($('#avgWindow').value)||50;
+ const selectedLeague=leagueMode;
+ const d=await api('/api/leaderboard?window='+windowSize+'&league='+selectedLeague);
+ if(tab!=='lb'||Number($('#avgWindow').value)!==windowSize||leagueMode!==selectedLeague)return;
+ $('#leagueNote').textContent=selectedLeague==='competitive'
+  ?'Každý účet má najviac jedného súťažného bota. Započítavajú sa iba súťažné zápasy medzi súťažnými botmi (začnú sa, keď sú aspoň dvaja).'
+  :'Všetci boti vrátane súťažných (🏆). Počítajú sa iba nesúťažné zápasy; súťažné výsledky zostávajú oddelené.';
+ $('#avgWindowLabel').textContent=windowSize;
  // Sort by name, not by leaderboard ranking, so the color doesn't change when scores move.
  const botNames=[...new Set([
-  ...d.rows.map(r=>r.name),...Object.keys(d.series),...Object.keys(d.avgseries)
+  ...(S?.bots||[]).map(b=>b.name),...d.rows.map(r=>r.name),...Object.keys(d.series),...Object.keys(d.avgseries)
  ])].sort((a,b)=>a.localeCompare(b,'sk'));
  const colorIndex=new Map(botNames.map((name,i)=>[name,i]));
  const col=name=>{
@@ -250,17 +466,19 @@ async function loadBoard(){
   if(i===undefined)return '#e2e8f0';
   return i<COL.length?COL[i]:`hsl(${(((i-COL.length)*137.508+215)%360).toFixed(3)} 85% 65%)`;
  };
- $('#rows').innerHTML=d.rows.map((r,i)=>`<tr><td>${i+1}.<td>${r.name}<td class=n>${nf(r.points)}`).join('')||'<tr><td colspan=3 class=mute>Žiadni boti.';
+ $('#rows').innerHTML=d.rows.map((r,i)=>`<tr><td>${i+1}.<td><i class=bot-dot style="background:${col(r.name)}"></i>${esc(botDisplay(r.name))}<td class=n>${nf(r.points)}`).join('')||'<tr><td colspan=3 class=mute>No bots yet.</td></tr>';
+ const byRate=[...d.rows].sort((a,b)=>b.points_per_game-a.points_per_game||b.games-a.games||a.name.localeCompare(b.name,'sk'));
+ $('#rateRows').innerHTML=byRate.map((r,i)=>`<tr><td>${i+1}.<td><i class=bot-dot style="background:${col(r.name)}"></i>${esc(botDisplay(r.name))}<td class=n>${r.points_per_game.toFixed(3)}<td class=n>${nf(r.points)}<td class=n>${nf(r.games)}</tr>`).join('')||'<tr><td colspan=5 class=mute>No bots yet.</td></tr>';
  const W=840,H=260,all=Object.values(d.series),len=Math.max(2,...all.map(s=>s.length)),mx=Math.max(1,...all.flat());
  const grid=[0,.25,.5,.75,1].map(t=>`<line x1=0 x2=${W} y1=${H-t*H} y2=${H-t*H} stroke="#1e293b"/><text x=-6 y=${H-t*H+4} text-anchor=end fill="#94a3b8" font-size=11>${nf(mx*t)}</text>`).join('');
  const path=s=>s.map((y,k)=>`${k?'L':'M'}${(k/(len-1)*W).toFixed(1)},${(H-y/mx*H).toFixed(1)}`).join('');
- $('#chart').innerHTML=`<svg viewBox="-50 -10 ${W+60} ${H+20}">${grid}${Object.entries(d.series).map(([n,s])=>`<path d="${path(s)}" fill=none stroke="${col(n)}" stroke-width=2 />`).join('')}</svg><div class=legend>${d.rows.map(r=>`<span><i style="background:${col(r.name)}"></i>${r.name}</span>`).join('')}</div>`;
+ $('#chart').innerHTML=`<svg viewBox="-50 -10 ${W+60} ${H+20}">${grid}${Object.entries(d.series).map(([n,s])=>`<path d="${path(s)}" fill=none stroke="${col(n)}" stroke-width=2 />`).join('')}</svg><div class=legend>${d.rows.map(r=>`<span><i style="background:${col(r.name)}"></i>${esc(botDisplay(r.name))}</span>`).join('')}</div>`;
  const as=d.avgseries,alen=Math.max(2,...Object.values(as).map(s=>s.length)),amx=Math.max(.01,...Object.values(as).flat()),H2=200;
  const AX=k=>(k/(alen-1)*W).toFixed(1),AY=v=>(H2-v/amx*H2).toFixed(1);
  const grid2=[0,.25,.5,.75,1].map(t=>`<line x1=0 x2=${W} y1=${AY(amx*t)} y2=${AY(amx*t)} stroke="#1e293b"/><text x=-6 y=${+AY(amx*t)+4} text-anchor=end fill="#94a3b8" font-size=11>${(amx*t).toFixed(2)}</text>`).join('');
  $('#avgchart').innerHTML=`<svg viewBox="-50 -10 ${W+60} ${H2+20}">${grid2}${Object.entries(as).map(([n,s])=>`<path d="${s.map((v,k)=>(k?'L':'M')+AX(k)+','+AY(v)).join('')}" fill=none stroke="${col(n)}" stroke-width=2 />`).join('')}</svg>`;
- const byAvg=[...d.rows].sort((a,b)=>b.avg50-a.avg50),am=Math.max(.01,...byAvg.map(r=>r.avg50));
- $('#avg').innerHTML=byAvg.map(r=>`<div class=bar><span>${r.name}</span><div><i style="width:${r.avg50/am*100}%;background:${col(r.name)}"></i></div><b>${r.avg50.toFixed(2)}</b></div>`).join('');
+ const byAvg=[...d.rows].sort((a,b)=>b.avg_recent-a.avg_recent),am=Math.max(.01,...byAvg.map(r=>r.avg_recent));
+ $('#avg').innerHTML=byAvg.map(r=>`<div class=bar><span>${esc(botDisplay(r.name))}</span><div><i style="width:${r.avg_recent/am*100}%;background:${col(r.name)}"></i></div><b>${r.avg_recent.toFixed(2)}</b></div>`).join('');
 }
 // Match history and its independent, locally controlled playback.
 async function loadMatches(){
@@ -291,7 +509,7 @@ async function loadMatches(){
    ?'Zatiaľ žiadne dokončené zápasy. Ak tu boli predtým, skontroluj history.json v priečinku so server.py.'
    :'';
  $('#mrows').innerHTML=d.matches.map(m=>`<tr><td>${new Date(m.t*1000).toLocaleString('sk-SK')}</td>
- <td>${Object.entries(m.points).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`${n===m.winner?'<b>'+n+'</b>':n} <span class=mute>${p}</span>`).join(', ')}</td>
+ <td>${Object.entries(m.points).sort((a,b)=>b[1]-a[1]).map(([n,p])=>`${n===m.winner?'<b>'+esc(n)+'</b>':esc(n)} <span class=mute>${p}</span>`).join(', ')}</td>
  <td>${m.replay?`<button onclick="openMatch('${m.id}')">Pozrieť</button>`:'<span class=mute>Bez záznamu</span>'}</td></tr>`).join('')||'<tr><td colspan="3" class="mute">Zatiaľ žiadne zápasy.</td></tr>';
  $('#matchesCount').textContent=d.total?`${matchOffset+1}–${matchOffset+d.matches.length} / ${d.total}`:'0 zápasov';
  $('#matchesPrev').disabled=matchOffset===0;
@@ -315,8 +533,8 @@ function renderMatchFrame(){
  $('#matchTitle').textContent='Zápas '+matchData.id+' – '+f.names.join(' vs ');
  $('#matchTable').innerHTML=f.names.map((name,i)=>{
   const out=!f.shown[i].length&&!f.hidden_counts[i];
-  const pub=f.shown[i].map(d=>die(d,'pub')).join('');
-  const hidden=(f.all_hidden?.[i]||[]).map(d=>die(d)).join('');
+  const pub=shownDiceHtml(f.shown[i]);
+  const hidden=hiddenDiceHtml(f.all_hidden?.[i]);
   return `<div class="row ${f.turn===i&&!over?'turn':''} ${out?'out':''}"><b class=nm>${name}</b><span>${pub}${hidden}</span></div>`;
  }).join('');
  $('#matchInfo').innerHTML=over?`<span class=bid>${f.names[f.winner]} wins</span>`:
@@ -325,7 +543,7 @@ function renderMatchFrame(){
  const detail=!r?'Začiatok zápasu':r.action==='bid'?`stavil ${r.count} × ${face(r.face)}`:
               r.action==='call'?'spochybnil stávku':r.action==='reveal'?`odhalil kocky ${JSON.stringify(r.indices)}`:JSON.stringify(r);
  $('#matchAction').textContent=a?`${a.bot}: ${detail}${a.note?' ('+a.note+')':''}`:detail;
- $('#matchLog').innerHTML=f.log.slice().reverse().map(l=>`<div>${l}</div>`).join('');
+ $('#matchLog').innerHTML=f.log.slice().reverse().map(l=>`<div>${esc(l)}</div>`).join('');
  $('#matchSeek').max=last;$('#matchSeek').value=matchIndex;
  $('#matchProgress').textContent=`Ťah ${matchIndex} / ${last}`;
  $('#matchPrev').disabled=matchIndex===0;$('#matchNext').disabled=matchIndex===last;
@@ -385,6 +603,5 @@ function updatePlaySettings(){
 }
 const debugGame=()=>post('/api/debug',{bots:[...document.querySelectorAll('#dbgbots input:checked')].map(i=>i.value),dice:+$('#dbgd').value||null}).then(r=>selectGame(r.id)).catch(e=>alert(e.message));
 const dbgStep=()=>post('/api/game/'+cur+'/step').then(tick),dbgAuto=()=>post('/api/game/'+cur+'/auto').then(tick);
-show('live');tick();setInterval(tick,800);
-setInterval(()=>{if(tab==='mt'&&matchOffset===0)loadMatches()},10000);
+switchAuth('login');initAuth();
 </script></body></html>
