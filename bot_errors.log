@@ -785,3 +785,232 @@ unt, face, matches)
     chance = 1 / (1 + math.exp(-sharpness * diff))
                       ~~~~~~~~^^^^^^^^^^^^^^^^^^^
 KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+n'],sample,preferred)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 907, in _rollout
+    action = _internal_move(hidden,shown,totals,turn,bid,bidder,must_raise,
+                            policies,rng,you)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 781, in _internal_move
+    public = [_shown_hits(shown, f) for f in range(1,7)]
+              ~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 489, in _shown_hits
+    return sum(_matches(d, face) for hand in shown for d in hand)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 489, in <genexpr>
+    return sum(_matches(d, face) for hand in shown for d in hand)
+    
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+['action'],sample,preferred)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 1139, in _rollout
+    action = _internal_move(hidden,shown,totals,turn,bid,bidder,must_raise,
+                            policies,rng,you)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 1041, in _internal_move
+    ev = 2 * (1 - st.less(need)) - st.expected_shortfall(need, own)
+                                   ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 696, in expected_shortfall
+    def expected_shortfall(self, threshold, cap):
+    
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+count, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 445, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 335, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 293, in policy_weights
+    chance = 1 / (1 + math.exp(-sharpness * diff))
+                      ~~~~~~~~^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 255, in policy_weights
+    immediate_value = call_probability * alternate_stats.bid_value(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        bid_quantity - public_new - h, reward_opp, opp_total
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 151, in bid_value
+    return gain * (1 - self._cdf(need)) - self.expected_loss(need, own_loss_cap)
+                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 148, in expected_loss
+    - (self._moment(need) - self._moment(a)))
+                            ~~~~~~~~~~~~^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 141, in _moment
+    return self.moment[max(0, min(self.n + 1, threshold))]
+                              ~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+n'],sample,preferred)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 907, in _rollout
+    action = _internal_move(hidden,shown,totals,turn,bid,bidder,must_raise,
+                            policies,rng,you)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 781, in _internal_move
+    public = [_shown_hits(shown, f) for f in range(1,7)]
+              ~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 489, in _shown_hits
+    return sum(_matches(d, face) for hand in shown for d in hand)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 489, in <genexpr>
+    return sum(_matches(d, face) for hand in shown for d in hand)
+               ~~~~~~~~^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single.py", line 484, in _matches
+    def _matches(die, face):
+    
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 276, in policy_weights
+    if alternative > best_alt:
+       ^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 276, in policy_weights
+    if alternative > best_alt:
+       ^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+count, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 445, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 335, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 248, in policy_weights
+    opp_stats.call_value(count - public - k, our_total,
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         penalty_opp, self.rivals)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_EV_dynamic.py", line 167, in call_value
+    def call_value(self, need, bidder_loss_cap, wrong_penalty, rivals):
+    
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+unt, face, matches)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        for count in legal_by_face[face])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 431, in <genexpr>
+    max(future_model.bid_value(count, face, matches)
+        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 321, in bid_value
+    weights = self.policy_weights(count, face)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\liars_dice_ev_model.py", line 276, in policy_weights
+    if alternative > best_alt:
+       ^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bot_runner.py", line 6, in <module>
+    for line in sys.stdin:
+                ^^^^^^^^^
+  File "C:\Users\domin\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 22, in decode
+    def decode(self, input, final=False):
+    
+KeyboardInterrupt
+['action'],sample,preferred)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 1139, in _rollout
+    action = _internal_move(hidden,shown,totals,turn,bid,bidder,must_raise,
+                            policies,rng,you)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 1013, in _internal_move
+    public = [_shown_hits(shown, f) for f in range(1,7)]
+              ~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 721, in _shown_hits
+    return sum(_matches(d, face) for hand in shown for d in hand)
+  File "C:\Users\domin\Downloads\koccky-main-upravene\koccky-main\bots\neural_bot_single_60000.py", line 721, in <genexpr>
+    return sum(_matches(d, face) for hand in shown for d in hand)
+               ~~~~~~~~^^^^^^^^^
+KeyboardInterrupt
